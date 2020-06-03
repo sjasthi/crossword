@@ -1,0 +1,461 @@
+
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN''http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'>
+<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en' lang='en'>
+<head>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale = 1">
+    <title>Word Find</title>
+    <style>	
+		table.crossword tr td {
+			width: 48px;
+			height: 48px;
+			font-size: 1.875em;
+			vertical-align:middle;
+			text-align: center;
+		}
+		
+		td.filled {
+			border: 2px solid #000000;
+			background-color: #EEEEEE;
+		}
+		
+		td.unfilled {
+			border: 0px solid #FFFFFF; 
+			background-color: #FFFFFF;
+			visibility: hidden;
+		}    
+
+        .wordhints{
+            border: 2px solid #000000; 
+            overflow:auto;
+        }
+        
+        .wordhints .wordhintsborder{
+            border-right: 2px dashed #000000; 
+        }
+        
+        .warningmessage {
+            border: 2px solid red;
+            color: red;
+            overflow: auto;
+        }
+        
+	</style>
+</head>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="jumbotron" id="jumbos">
+        </div>
+        <div class="panel">
+            <div class="panel-group">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div align="center"><h2>Crossword Puzzle</h2></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div align="center">
+                            <h3></h3>
+                        </div>
+                        <div align="center">
+                            <h4></h4>
+                        </div>
+                        <div align="center">
+                            <table id="grid" class="crossword">
+								<tr><td class="filled">1</td>
+												<td class="filled"> </td>
+												<td class="filled"> </td>
+												<td class="filled"> </td>
+												<td class="filled"> </td>
+												<td class="filled">1</td>
+												<td class="filled"> </td>
+												<td class="filled"> </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												</tr><tr><td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="filled"> </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="filled">2</td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												</tr><tr><td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="filled">2</td>
+												<td class="filled"> </td>
+												<td class="filled"> </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="filled"> </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												</tr><tr><td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="filled">3</td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="filled"> </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="filled"> </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												</tr><tr><td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="filled"> </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="filled">3</td>
+												<td class="filled"> </td>
+												<td class="filled"> </td>
+												<td class="filled"> </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												</tr><tr><td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="filled">4</td>
+												<td class="filled"> </td>
+												<td class="filled"> </td>
+												<td class="filled"> </td>
+												<td class="filled"> </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												</tr><tr><td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="filled"> </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												</tr><tr><td class="filled">5</td>
+												<td class="filled"> </td>
+												<td class="filled"> </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="filled">4</td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												</tr><tr><td class="filled"> </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="filled">6</td>
+												<td class="filled"> </td>
+												<td class="filled"> </td>
+												<td class="filled"> </td>
+												<td class="filled"> </td>
+												<td class="filled"> </td>
+												<td class="filled"> </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												</tr><tr><td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="filled"> </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="filled"> </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												</tr>							</table>
+                        </div>
+						<br><br>
+						<div align="center" class="wordhints">
+							<div class="col-sm-6 wordhintsborder">
+								<div class="row">
+									<div class="col-sm-12">
+										<h3>Across</h3>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-sm-12" style="text-align:left;">
+										<h4>0) something wrong or unpleasant
+</h4><br><h4>3) having a good time
+</h4><br><h4>5) a sour fruit
+</h4><br><h4>1) something you are buried in
+</h4><br><h4>0) the bright ball in the day sky
+</h4><br><h4>2) an expression you use when you walk away from someone
+</h4><br>									</div>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="row">
+									<div class="col-sm-12">
+										<h3>Down</h3>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-sm-12" style="text-align:left;">
+										<h4>0) the bright ball in the day sky
+</h4><br><h4>5) a gathering of items
+</h4><br><h4>8) something you tell someone to get them to laugh</h4><br><h4>2) preparing plans
+</h4><br><h4>6) having an amazing time
+</h4><br>                                        
+									</div>
+								</div>
+							</div>
+                        </div>
+                        <br><br><br><br>
+                        <div align="center" class="warningmessage">
+                            <div class="col-sm-12">
+                                THIS IS A WARNING MESSAGE
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div align="center"><h2>Crossword Options</h2></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-sm-12" align="center">
+                                <div class="col-sm-6">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <h3>Puzzle Options</h3>
+                                        </div>
+                                    </div>
+                                    <div align="left">
+                                        <div class="row">
+                                            <div class="col-sm-12" >
+                                                <input type="checkbox" checked> Show Solution
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <div class="row">
+                                            <div class="col-sm-12">
+                                                <input type="checkbox" checked> Show blank squares
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <h3>Look Options</h3>
+                                        </div>
+                                    </div>
+                                    <div align="left" >
+                                        <div class="row">
+                                            <div class="col-sm-6" >
+                                                <label>Blank Square Color</label>
+                                            </div>
+                                            <div class="col-sm-6" >
+                                                <input type="text" class='my_color'/>
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <div class="row">
+                                            <div class="col-sm-6" >
+                                                <label>Letter Square Color</label>
+                                            </div>
+                                            <div class="col-sm-6" >
+                                                <input type="text" class='my_color'/>
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <div class="row">
+                                            <div class="col-sm-6" >
+                                                <label>Letter Color</label>
+                                            </div>
+                                            <div class="col-sm-6" >
+                                                <input type="text" class='my_color'/>
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <div class="row">
+                                            <div class="col-sm-6" >
+                                                <label>Line Color</label>
+                                            </div>
+                                            <div class="col-sm-6" >
+                                                <input type="text" class='my_color'/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div align="center"><h2>Crossword Solution</h2></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div align="center">
+                            <h3></h3>
+                        </div>
+                        <div align="center">
+                            <h4></h4>
+                        </div>
+                        <div align="center">
+							<table id="grid" class="crossword">
+								<tr><td class="filled">h</td>
+												<td class="filled">o</td>
+												<td class="filled">r</td>
+												<td class="filled">r</td>
+												<td class="filled">i</td>
+												<td class="filled">b</td>
+												<td class="filled">l</td>
+												<td class="filled">e</td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												</tr><tr><td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="filled">u</td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="filled">j</td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												</tr><tr><td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="filled">f</td>
+												<td class="filled">u</td>
+												<td class="filled">n</td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="filled">o</td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												</tr><tr><td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="filled">a</td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="filled">d</td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="filled">k</td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												</tr><tr><td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="filled">r</td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="filled">l</td>
+												<td class="filled">i</td>
+												<td class="filled">m</td>
+												<td class="filled">e</td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												</tr><tr><td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="filled">g</td>
+												<td class="filled">r</td>
+												<td class="filled">a</td>
+												<td class="filled">v</td>
+												<td class="filled">e</td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												</tr><tr><td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="filled">a</td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												</tr><tr><td class="filled">s</td>
+												<td class="filled">u</td>
+												<td class="filled">n</td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="filled">f</td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												</tr><tr><td class="filled">z</td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="filled">g</td>
+												<td class="filled">o</td>
+												<td class="filled">o</td>
+												<td class="filled">d</td>
+												<td class="filled">u</td>
+												<td class="filled">y</td>
+												<td class="filled">e</td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												</tr><tr><td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="filled">e</td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="filled">n</td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+												</tr>							</table>
+                        </div>
+						<br><br>
+						<div align="center" class="wordhints">
+							<div class="col-sm-6 wordhintsborder">
+								<div class="row">
+									<div class="col-sm-12">
+										<h3>Across</h3>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-sm-12" style="text-align:left;">
+										<h4>0) horrible</h4><br><h4>3) fun</h4><br><h4>5) lime</h4><br><h4>1) grave</h4><br><h4>0) sun</h4><br><h4>2) gooduye</h4><br>									</div>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="row">
+									<div class="col-sm-12">
+										<h3>Down</h3>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-sm-12" style="text-align:left;">
+										<h4>0) sun</h4><br><h4>5) bundle</h4><br><h4>8) joke</h4><br><h4>2) arrange</h4><br><h4>6) fun</h4><br>                                        
+									</div>
+								</div>
+							</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+<script>
+    $(document).ready(function() {
+            $(".my_color").spectrum({
+            color: "#f00"
+        });
+    });
+</script>
+
+</html>

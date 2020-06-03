@@ -1,0 +1,54 @@
+.jumbotron {
+	background-image: url("silcHeader.png");
+	-webkit-background-size: 100% 100%;
+	-moz-background-size: 100% 100%;
+	-o-background-size: 100% 100%;
+	background-size: 100% 100%;
+	height: 179px;
+}
+
+table.crossword tr td {
+	width: 48px;
+	height: 48px;
+	font-size: 1.875em;
+	vertical-align:middle;
+	text-align: center;
+}
+
+table.puzzle tr td {
+	width: 48px;
+	height: 48px;
+	font-size: 20px;
+	vertical-align: top;
+	text-align: left;
+}
+
+td.filled {
+	border: 2px solid #000000;
+	background-color: #EEEEEE;
+}
+
+td.unfilled {
+	border: 0px solid #FFFFFF; 
+	background-color: #FFFFFF;
+	visibility: hidden;
+}    
+
+.wordhints{
+	border: 2px solid #000000; 
+	overflow:auto;
+}
+
+.wordhints .crosswordHintsBorderAcross{
+	border-right: 2px dashed #000000; 
+}
+
+.wordhints .crosswordHintsBorderDown{
+	border-left: 2px dashed #000000; 
+}
+
+.warningmessage {
+	border: 2px solid red;
+	color: red;
+	overflow: auto;
+}
