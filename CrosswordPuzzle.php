@@ -83,36 +83,86 @@
 	// Generates the word list for words paired with hints
 	// Splits word from hint by taking the sides from the first comma, then trims extra space from each
 	// Returns array in format word[i][0] = word, word[i][1] = hint
-	function generateWordList($wordInput){
-		
+
+	//Updated to not require hints for skeleton and fillin @kc9718us
+	function generateWordList($wordInput){	
 		$words = [];
 		$wordLine = [];
 		
 		$lines = explode("\n", $wordInput);
 		//var_dump($lines);
-		foreach($lines as $line){
-			$word = strstr($line, ',', true);
-			//var_dump($word);
-			$wordP = new wordProcessor($word, "telugu");
-			$wordP->trim();
-			//$wordP->toCaps();
-			
-			$word = $wordP->getWord();
-			$hint = trim(ltrim(strstr($line, ','), ','));
-						//var_dump($word);
-//var_dump($hint);
-
-			if(!(empty($word) || empty($hint))){				
-				$wordLine[0] = $word;
-				$wordLine[1] = $hint;
-				array_push($words, $wordLine);
+	
+		//Pull puzzleType for creating wordlist
+		if($_SERVER['REQUEST_METHOD'] == 'POST'){
+	
+			// Set starting variables gotten from post
+			$puzzleType = $_POST["puzzletype"];
+		//Check for puzzle type, if crossword, proceed as normal
+			if($puzzleType == "crossword"){ 
+				foreach($lines as $line){
+					$word = strstr($line, ',', true);
+					//var_dump($word);
+					$wordP = new wordProcessor($word, "telugu");
+					$wordP->trim();
+					//$wordP->toCaps();
 				
+					$word = $wordP->getWord();
+	
+					$hint = trim(ltrim(strstr($line, ','), ','));
+	
+					if(!(empty($word) || empty($hint))){				
+					$wordLine[0] = $word;
+					$wordLine[1] = $hint;
+					array_push($words, $wordLine);
+					
+					}
+	
+				}
 			}
-			
+		//If not skeleton or fillin, check for hint. If no hint, append hint
+			else{
+				foreach($lines as $line){
+				//Check to see if there is a hint, if no hint, append 1 as hint
+					$pos = strpos($line, ',');
+					if($pos == false){
+						$line .= ",1";
+					}
+					//Proceed as normal
+	
+					$word = strstr($line, ',', true);
+					//var_dump($word);
+	
+					$wordP = new wordProcessor($word, "telugu");
+					$wordP->trim();
+					//$wordP->toCaps();
+				
+					$word = $wordP->getWord();
+	
+					$hint = trim(ltrim(strstr($line, ','), ','));
+	
+					if(!(empty($word) || empty($hint))){				
+						$wordLine[0] = $word;
+						$wordLine[1] = $hint;
+						array_push($words, $wordLine);
+					
+					}
+	
+				}
+			}
+	
+	
+						//var_dump($word);
+	//var_dump($hint);
+	
+	// If visiting for the first time by skipping the index page redirect them to it
+		}else{
+			$url = "index.php";
+	
+			header("Location: ".$url);
+			die();
 		}
-		
 		return $words;
-	}
+		}
 	
 	// Number - Hint - Direction
 	function getCrosswordHints($puzzleNumbers){
