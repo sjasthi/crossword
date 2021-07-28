@@ -89,9 +89,6 @@
 
 	//Updated to not require hints for skeleton and fillin @kc9718us
 	function generateWordList($wordInput){	
-=======
-	function generateWordList($wordInput){
-
 
 		$words = [];
 		$wordLine = [];
@@ -172,7 +169,6 @@
 		return $words;
 		}
 	
-=======
 		foreach($lines as $line){
 			$word = strstr($line, ',', true);
 			//var_dump($word);
