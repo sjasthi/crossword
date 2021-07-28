@@ -16,7 +16,7 @@ class CrosswordPuzzleMaker{
 	private $wordProcessor;
 	
 	public function __construct($width, $height, $words){
-		require("Crossword.php");
+		require_once("Crossword.php");
 		
 		$startTime = time();
 		$endTime = $startTime + 4;

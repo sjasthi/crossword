@@ -1,7 +1,93 @@
+
+<!-- Moved the Crossword Option to the top to avoid repeating. It also instantizes only once but still affects all puzzles. Removed the puzzle option as
+ it is not required. @kc9718us -->
+<html>
+<body>
+			<div class="panel-heading">
+							<div class="row">
+								<div class="col-sm-12">
+									<div align="center"><h2>Crossword Options</h2></div>
+								</div>
+							</div>
+						</div>
+						<div class="panel-body">
+							<div class="row">
+								<div class="col-sm-12" align="center">
+									<div class="col-sm-6">
+										<div class="row">
+											<div class="col-sm-12">
+												<h3>Puzzle Options</h3>
+											</div>
+										</div>
+										<div align="left">
+											<div class="row">
+												<div class="col-sm-12" >
+													<input type="checkbox" class="showSolutionCheckbox" onchange="solutionCheckboxChange()" checked> Show Solution
+												</div>
+											</div>
+											<br>
+											<div class="row">
+												<div class="col-sm-12">
+													<input type="checkbox" class="showBlankSquaresCheckbox" name="showBlankSquares" onchange="blankSquareCheckboxChange()"> Show blank squares
+												</div>
+											</div>
+											<br>
+
+										</div>
+									</div>
+									<div class="col-sm-6">
+										<div class="row">
+											<div class="col-sm-12">
+												<h3>Look Options</h3>
+											</div>
+										</div>
+										<div align="left" >
+											<div class="row">
+												<div class="col-sm-6" >
+													<label>Blank Square Color</label>
+												</div>
+												<div class="col-sm-6" >
+													<input type="text" class='blankSquareColor' name='blankSquareColor' value='#FFFFFF'/>
+												</div>
+											</div>
+											<br>
+											<div class="row">
+												<div class="col-sm-6" >
+													<label>Letter Square Color</label>
+												</div>
+												<div class="col-sm-6" >
+													<input type="text" class='letterSquareColor' name='letterSquareColor' value='#EEEEEE'/>
+												</div>
+											</div>
+											<br>
+											<div class="row">
+												<div class="col-sm-6" >
+													<label>Letter Color</label>
+												</div>
+												<div class="col-sm-6" >
+													<input type="text" class='letterColor' name='letterColor' value='#000000'/>
+												</div>
+											</div>
+											<br>
+											<div class="row">
+												<div class="col-sm-6" >
+													<label>Line Color</label>
+												</div>
+												<div class="col-sm-6" >
+													<input type="text" class='lineColor' name='lineColor' value='#000000'/>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+</body>
+</html>
 <?php
 	session_start();
 	session_unset();
-	require("CrosswordPuzzleMaker.php");
+	require_once("CrosswordPuzzleMaker.php");
 	require("word_processor.php");
 	
 	if($_SERVER['REQUEST_METHOD'] == 'POST'){
@@ -13,6 +99,7 @@
 		$width = $_POST["width"];
 		$puzzleType = $_POST["puzzletype"];
 		$wordHintList = $_POST["wordInput"];
+		$batch = $_POST['batchNumber'];
 		
 		// Set defaults if they weren't set on index page
 		if($title == "" || $title == null){
@@ -36,14 +123,38 @@
 		else if($width > 100){
 			$width = 100;
 		}
+
+		//Added set defaults for batch @kc9718us
+		if($batch == 0 || $batch == null){
+			$batch = 3;
+		}
+		else if($batch > 10){
+			$batch == 10;
+		}
 		
 		// Create an array of words paired with hints
 		// $words[i][0] is the word, $words[i][1] is the hint
 		$words = generateWordList($wordHintList);
 						//var_dump($words);
 
+		//Variables for goto loops @kc9718us
+		$round = 0;
+		$endRound = intdiv(count($words),$batch);
+
+		//Loop to create multiple puzzles using goto. Upon less than the required number of batch, the loop will end itself. @kc9718us
+		Beginning:
+		if(count($words) < $batch){
+			goto End;
+		}else{
+		$batchWords = generateBatch($words);
+		$words=removeBatch($batchWords, $words);
+
 		// Creates a few Crossword Puzzles and then keeps the one with the most placed words
-		$crosswordMaker = new CrosswordPuzzleMaker($width, $height, $words);
+		// Edited to accept batchWords instead of words to make Batch successful @kc9718us
+		$crosswordMaker = new CrosswordPuzzleMaker($width, $height, $batchWords);
+		}
+
+
 
 		// Get puzzle/solution details from the Crossword Maker
 		$solution = $crosswordMaker->getSolution();
@@ -51,9 +162,13 @@
 		$puzzleNumbers = $crosswordMaker->getPuzzleNumbers();
 		//var_dump($puzzleNumbers);
 		$crosswordHints = getCrosswordHints($puzzleNumbers);
+		//var_dump($crosswordHints);
 		$fillinHints = $crosswordMaker->getFillInHints();		
 		$unplacedWords = $crosswordMaker->getUnplacedWords();
 		$skeletonHints = $crosswordMaker->getSkeletonHints();
+		
+
+		
 		
 		// Set count values to 0 - used for setting the middle divider between Across and Down hint lists
 		// Depending on which value has the highest count determines if the border will appear on right/left side.
@@ -180,7 +295,89 @@
 		
 		return $hints;
 	}
+
+	/* Added functon generateBatch. The function takes the generatedWordList array and breaks it down even further depending on the batch count. The function
+	returns an array based upon the number of the posted batch number. @kc9718us
+	 */
+	function generateBatch($wordArray){
+		if($_SERVER['REQUEST_METHOD'] == 'POST'){
+	
+			// Set starting variables gotten from post
+			$batch = $_POST['batchNumber'];
+
+			$batchArray = [];
+			//Sets count to 1 due to the first element of the array already in use
+			$batchCount = 1;
+			$num = 0;
+
+			//Initializes and removes the first word of the array
+			$initialWord = $wordArray[0]["0"];
+			array_push($batchArray, $wordArray[0]);
+			array_splice($wordArray,0,1);
+
+			//Splits the first word to be used as a base for comparing characters from other words of the array
+			$batchLetter = str_split($initialWord);
+
+			//Goes through each word of the array to see if they contain similiar character to the first word.
+			//Upon discovery, add the word to the new array and remove from the old array
+			foreach($wordArray as $key){
+				//If the number of words added to the new array matches the batch number, close the loop
+				if($batchCount != $batch){
+					$temp = str_split($key[0]);
+
+					foreach($temp as $test){
+						if(in_array($test,$batchLetter)){
+							array_push($batchLetter, $temp);
+							array_push($batchArray, $wordArray[$num]);
+							unset($wordArray[$num]);
+							$batchCount++;
+							break;
+						
+						}
+					}
+					$num++;
+				}else{
+					break;
+				}
+			}
+			//array_values($wordArray);
+
+
+			return $batchArray;
+			// If visiting for the first time by skipping the index page redirect them to it
+		}else{
+			$url = "index.php";
+	
+			header("Location: ".$url);
+			die();
+		}
+		
+		return $words;
+	}
+
+	/* Added function removeBatch. The function compares and removes the new batchArray words from the old wordArray.  It then returns the newly spliced old 
+	wordArray. @kc9718us
+	*/
+	function removeBatch($batchArray, $wordArray){
+		$count = 0;
+		foreach($wordArray as $key){
+			$temp = $key[0];
+			foreach($batchArray as $value){
+				if($temp == $value[0]){
+					array_splice($wordArray,$count,1);
+					//Remove count to keep index correct
+					$count--;
+					break;
+				}
+			}
+			$count++;
+		}
+		return $wordArray;
+	}
 ?>
+
+<!-- Gutted out most of the unrequired codes and kept the codes for skeleton puzzles only. @kc9718us -->
+
 <!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN''http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'>
 <html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en' lang='en'>
 <head>
@@ -206,14 +403,6 @@
 	<link rel="stylesheet" type="text/css" href="crosswordstyle.css">
 </head>
 <body>
-	<form action="power.php" method="post" id="theform">
-		<input type="hidden" name="powerCross" id="powerCross">
-		<input type="hidden" name="powerPuzzle" id="powerPuzzle">
-		<input type="hidden" name="powerSolution" id="powerSolution">
-		//HERE* adding a power point button
-		<button type="button" id="sub" class="btn btn-primary" style="position: absolute; top: 550px; right: 25px;">PowerPoint</button>
-	</form>
-
 	<form action="CrosswordSave.php" method="post">
 		<div class="container-fluid">
 			<div class="jumbotron" id="jumbos">
@@ -237,6 +426,7 @@
 					?>
 				</div>	
 			</div>
+
 			<br>
 			<div class="panel">
 				<div class="panel-group">
@@ -255,28 +445,6 @@
 							</div>
 							<div align="center">
 								<h4><?php echo($subtitle);?></h4>
-							</div>
-							<div align="center">
-								<table id="grid" class="crossword puzzle crosswordPuzzle">
-									<?php
-										// Print the crossword puzzle
-										foreach ($puzzle as $key => $row) 
-										{		
-											echo'<tr>';
-											foreach ($row as $k => $val){
-												if($val != "0"){
-													echo'<td class="filled">'.$val.'</td>
-													';
-												}
-												else{
-													echo'<td class="unfilled"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
-													';
-												}
-											}
-											echo'</tr>';
-										}
-									?>
-								</table>
 							</div>
 							<div align="center">
 								<table id="grid" class="crossword puzzle skeletonPuzzle">
@@ -301,102 +469,7 @@
 								</table>
 							</div>
 							<br><br>
-							<h2 align="center"> Hints <h2>
-							<div align="center" class="wordhints crosswordHints">
-								<div class="col-sm-6 crosswordHintsBorderAcross">
-									<div class="row">
-										<div class="col-sm-12">
-											<h3>Across</h3>
-										</div>
-									</div>
-									<div class="row">
-										<div class="col-sm-12" style="text-align:left;">
-											<?php
-												// Print hints going across for crossword puzzle
-												foreach($crosswordHints as $hint) {
-													if($hint[2] == "right"){
-														echo("<h4>".$hint[0].") ".$hint[1]."</h4><br>");
-														$wordsAcrossCount++;
-													}
-												}
-											?>
-										</div>
-									</div>
-								</div>
-								<div class="col-sm-6 crosswordHintsBorderDown">
-									<div class="row">
-										<div class="col-sm-12">
-											<h3>Down</h3>
-										</div>
-									</div>
-									<div class="row">
-										<div class="col-sm-12" style="text-align:left;">
-											<?php
-												// Print hints going down for crossword puzzle
-												foreach($crosswordHints as $hint) {
-													if($hint[2] == "down"){
-														echo("<h4>".$hint[0].") ".$hint[1]."</h4><br>");
-														$wordsDownCount++;
-													}
-												}
-											?>                                        
-										</div>
-									</div>
-								</div>
-							</div>
-							<div align="center" class="wordhints fillinHints">
-								<div class="col-sm-12">
-									<div class="row">
-										<div class="col-sm-12">
-											<h3>Fill-In Words</h3>
-										</div>
-									</div>
-									<div class="row">
-										<div class="col-sm-12" style="text-align:left;">
-											<?php
-											
-												// Print hints going across for fillin puzzle
-												// Print 4 categories per row
 
-												$currentNum = null;
-												$currentIteration = 0;
-												
-												foreach($fillinHints as $hint) {
-													if($currentNum != $hint[1]){
-														$currentNum = $hint[1];
-														
-														// If 4th iteration then start new row
-														if($currentIteration % 4 == 0){
-															// If first time looping, start first row
-															if($currentIteration == 0){
-																echo('<div class="row">');
-															}
-															// Close previous length div and previous row, start new row
-															else{
-																echo('</div></div><div class="row">');
-															}
-															// Start new length div
-															echo('<div class="col-sm-3"><h3><u>'.$currentNum.' Length Words</u></h3>');
-														}
-														// Close previous length div, start new one
-														else{
-															echo('</div><div class="col-sm-3"><h3><u>'.$currentNum.' Length Words</u></h3>');
-														}													
-														
-														$currentIteration++;
-													}
-													
-													// Place word
-													echo("<h4>".$hint[0]."</h4>");
-												}
-												
-												// Close current row and length divs
-												echo('</div></div>');
-											?>
-										</div>
-									</div>
-								</div>
-							</div>
 							<div align="center" class="wordhints skeletonHints">
 								<div class="col-sm-12">
 									<div class="row">
@@ -416,93 +489,7 @@
 								</div>
 							</div>
 						</div>
-						<div class="panel-heading">
-							<div class="row">
-								<div class="col-sm-12">
-									<div align="center"><h2>Crossword Options</h2></div>
-								</div>
-							</div>
-						</div>
-						<div class="panel-body">
-							<div class="row">
-								<div class="col-sm-12" align="center">
-									<div class="col-sm-6">
-										<div class="row">
-											<div class="col-sm-12">
-												<h3>Puzzle Options</h3>
-											</div>
-										</div>
-										<div align="left">
-											<div class="row">
-												<div class="col-sm-12" >
-													<input type="checkbox" class="showSolutionCheckbox" onchange="solutionCheckboxChange()" checked> Show Solution
-												</div>
-											</div>
-											<br>
-											<div class="row">
-												<div class="col-sm-12">
-													<input type="checkbox" class="showBlankSquaresCheckbox" name="showBlankSquares" onchange="blankSquareCheckboxChange()"> Show blank squares
-												</div>
-											</div>
-											<br>
-											<div class="row">
-												<div class="col-sm-3">
-													<select class="form-control" id="puzzletype" name="puzzleType" onchange="puzzleHintsChange()">
-														<option value="crossword" <?php if($puzzleType == "crossword"){echo('selected="selected"');} ?>>Crossword</option>
-														<option value="fillin" <?php if($puzzleType == "fillin"){echo('selected="selected"');} ?>>Fill-In</option>
-														<option value="skeleton" <?php if($puzzleType == "skeleton"){echo('selected="selected"');} ?>>Skeleton</option>
-													</select>
-												</div>
-											</div>
-										</div>
-									</div>
-									<div class="col-sm-6">
-										<div class="row">
-											<div class="col-sm-12">
-												<h3>Look Options</h3>
-											</div>
-										</div>
-										<div align="left" >
-											<div class="row">
-												<div class="col-sm-6" >
-													<label>Blank Square Color</label>
-												</div>
-												<div class="col-sm-6" >
-													<input type="text" class='blankSquareColor' name='blankSquareColor' value='#FFFFFF'/>
-												</div>
-											</div>
-											<br>
-											<div class="row">
-												<div class="col-sm-6" >
-													<label>Letter Square Color</label>
-												</div>
-												<div class="col-sm-6" >
-													<input type="text" class='letterSquareColor' name='letterSquareColor' value='#EEEEEE'/>
-												</div>
-											</div>
-											<br>
-											<div class="row">
-												<div class="col-sm-6" >
-													<label>Letter Color</label>
-												</div>
-												<div class="col-sm-6" >
-													<input type="text" class='letterColor' name='letterColor' value='#000000'/>
-												</div>
-											</div>
-											<br>
-											<div class="row">
-												<div class="col-sm-6" >
-													<label>Line Color</label>
-												</div>
-												<div class="col-sm-6" >
-													<input type="text" class='lineColor' name='lineColor' value='#000000'/>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
+
 						<br>
 						<div class="panel panel-primary solutionSection">
 							<div class="panel-heading ">
@@ -592,6 +579,42 @@
 	</form>
 </body>
 </html>
+<?php
+//Added codes for goto to loop the puzzle to the top to rerun to the codes to create puzzles. @kc9718us
+while($round != $endRound){
+	$round++;
+	goto Beginning;
+}
+//End point for goto loop to finish codes
+End:
+?> 
+<!-- Moved unplaced word warning here. Changed a few codes to use $words array instead of unplacedword. @kc9718us -->
+<html>
+	<body>
+	<div align="center" class="warningmessage" 
+				<?php
+					// Display warning message only if there are unplaced words
+					if(count($words) == 0){
+						echo('style="display: none;"');
+					}
+				?>>
+				<div class="col-sm-12">
+					<h3> Warning - The following words could not be placed </h3>
+					<?php
+						// Print unplaced words
+						foreach($words as $word) {
+							echo("<h4>".$word[0]."</h3>");
+							
+						}
+					?>
+				</div>	
+			</div>
+			<br>
+			<br>
+	</body>
+</html>
+
+
 <script>
 	// Set default spectrum elements
 	$(".blankSquareColor").spectrum({
@@ -722,52 +745,5 @@
 			$(".skeletonPuzzle").show();
 		}
 	}
-
-	$(document).ready(function() {
-
-			$("#sub").click(function(event) {
-
-					event.preventDefault;
-
-					var canvasCross = $(".canvasCross");
-					var canvasPuzzle = $(".canvasPuzzle");
-					var canvasSolution = $(".canvasSolution")
-
-					window.scrollTo(0,0);
-
-					if($(".skeletonHints").is(":visible")) {
-
-							html2canvas(canvasPuzzle[0]).then(function(canvas){
-
-							$("#powerPuzzle").val(canvas.toDataURL('image/jpeg'));
-
-					})
-
-					} else {
-
-							html2canvas(canvasCross[0]).then(function(canvas){
-
-							$("#powerCross").val(canvas.toDataURL('image/jpeg'));
-
-					})
-
-					}
-
-					html2canvas(canvasSolution[0]).then(function(canvas){
-
-							$("#powerSolution").val(canvas.toDataURL('image/jpeg'));
-
-							if(canvas) {
-
-									$("#theform").submit();
-									alert("Power Point File Donwloaded");
-							}
-
-					})
-
-			})
-
-		})
-
 </script>
 </html>
