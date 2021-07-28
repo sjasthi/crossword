@@ -48,8 +48,6 @@
 		//(HERE*) Get puzzle/solution details from the Crossword Maker
 		$solution = $crosswordMaker->getSolution();
 		$puzzle = $crosswordMaker->getPuzzle();
-
-		//(HERE*)
 		$puzzleNumbers = $crosswordMaker->getPuzzleNumbers();
 		//var_dump($puzzleNumbers);
 		$crosswordHints = getCrosswordHints($puzzleNumbers);
@@ -86,17 +84,14 @@
 	// Splits word from hint by taking the sides from the first comma, then trims extra space from each
 	// Returns array in format word[i][0] = word, word[i][1] = hint
 
-
 	//Updated to not require hints for skeleton and fillin @kc9718us
 	function generateWordList($wordInput){	
-
 		$words = [];
 		$wordLine = [];
 
 		$lines = explode("\n", $wordInput);
 		//var_dump($lines);
 
-	
 		//Pull puzzleType for creating wordlist
 		if($_SERVER['REQUEST_METHOD'] == 'POST'){
 	
@@ -168,31 +163,6 @@
 		}
 		return $words;
 		}
-	
-		foreach($lines as $line){
-			$word = strstr($line, ',', true);
-			//var_dump($word);
-			$wordP = new wordProcessor($word, "telugu");
-			$wordP->trim();
-			//$wordP->toCaps();
-
-			$word = $wordP->getWord();
-			$hint = trim(ltrim(strstr($line, ','), ','));
-						//var_dump($word);
-//var_dump($hint);
-
-			if(!(empty($word) || empty($hint))){
-				$wordLine[0] = $word;
-				$wordLine[1] = $hint;
-				array_push($words, $wordLine);
-
-			}
-
-		}
-
-		return $words;
-	}
-
 
 	// Number - Hint - Direction
 	function getCrosswordHints($puzzleNumbers){
@@ -247,7 +217,6 @@
 		<input type="hidden" name="powerCross" id="powerCross">
 		<input type="hidden" name="powerPuzzle" id="powerPuzzle">
 		<input type="hidden" name="powerSolution" id="powerSolution">
-		//HERE* adding a power point button
 		<button type="button" id="sub" class="btn btn-primary" style="position: absolute; top: 550px; right: 25px;">PowerPoint</button>
 	</form>
 	<form action="CrosswordSave.php" method="post">
