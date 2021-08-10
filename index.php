@@ -1,3 +1,9 @@
+
+<?php
+    include_once('Connection.php');
+?>
+
+
 <!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN''http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'>
 <html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en' lang='en'>
 <head>
@@ -26,6 +32,9 @@
 		}
 	</style>
 </head>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
 <body>
     <form target="_blank" action="CrosswordPuzzle.php" method="post" class="form-horizontal">
         <div class="container-fluid">
@@ -79,6 +88,14 @@
                                     </select>
                                 </div>
                             </div>
+                            <!--Added input box for batch numbers. Diabled by default but will enable upon skeleton option chosen. @kc9718us  -->
+                            <div class ="form-group">
+                                <div class="col-sm-1"></div>
+                                <label class="control-label col-sm-1" sytle="text-align: left;">Batch Number</label>
+                                <div class="col-sm-1">
+                                    <input class="form-control" id="batchNumber" name="batchNumber" disabled="true" value="3">
+                                </div>
+                            </div>
                             <div class="form-group">
                                 <div class="col-sm-1"></div>
                                 <label class="control-label col-sm-9" style="text-align: left;">Input (Enter the Word and Clue separated by a comma, each pair on a separate line)
@@ -107,8 +124,18 @@
                                 <div class="row">
                                     <div class="text-center">
                                         <input type="submit" name="submit" class="btn btn-primary btn-lg" value="Generate">
-                                    </div>
-                                </div>
+
+                                        <!-- Added Save button. @kc9718us -->
+                                        <input type="submit"id="save" name="save" formaction = "Save.php" class="btn btn-primary btn-lg" value="Save"> 
+
+                                        <!-- Added Batch HTML and Batch PPT button. Diasabled by default but will enable upont skeleton option chosen. @kc9718us -->
+                                        <input type="submit" id="batch" name="batch" formaction = "SkeletonPuzzle.php" disabled="true" class="btn btn-primary btn-lg" value="Batch HTML">
+                                    
+                                        <input type="submit" id="ppt" name="ppt" formaction = "SkeletonPPT.php" disabled = "true" class="btn btn-primary btn-lg" value="Batch PPT">
+
+                                        <input type="submit" id="list" name="list" formaction = "list.php" class="btn btn-primary btn-lg" value="List">
+                                    </div>                                   
+                                </div>                            
                             </div>
                         </div>
                     </div>
@@ -118,3 +145,33 @@
     </form>
 </body>
 </html>
+
+<!-- Script for enabling and disabling batch features upon puzzle type selections. @kc9718us -->
+<script>
+$(document).ready(function () {
+$('#puzzletype').change(function () {
+    
+    selectVal = $('#puzzletype').val();
+    //console.log(selectVal);
+
+   
+    if (selectVal == 'skeleton') {
+       
+       $('#batch').removeAttr('disabled','disabled');
+       $('#ppt').removeAttr('disabled','disabled');
+       $('#batchNumber').removeAttr('disabled','disabled');
+    }
+    if(selectVal != 'skeleton'){
+       
+      $('#batch').attr('disabled','disabled');
+      $('#ppt').attr('disabled','disabled');
+      $('#batchNumber').attr('disabled','disabled');
+
+    }
+  })
+  
+});
+</script>
+
+
+

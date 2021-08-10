@@ -22,6 +22,8 @@ ini_set('display_errors', 1);
 	$solution = serializeArray($_SESSION["solution"]);
 	$wordsAcrossCount = $_SESSION["wordsAcrossCount"];
 	$wordsDownCount = $_SESSION["wordsDownCount"];
+
+	$batch = "3";
 	
 	if($puzzleType == 1){
 		$hints = serializeArray($_SESSION["crosswordHints"]);
