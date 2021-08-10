@@ -139,6 +139,7 @@
 
 		//Variables for goto loops @kc9718us
 		$round = 0;
+		$wordCount = 0;
 		$endRound = intdiv(count($words),$batch);
 
 		//Loop to create multiple puzzles using goto. Upon less than the required number of batch, the loop will end itself. @kc9718us
@@ -146,9 +147,27 @@
 		if(count($words) < $batch){
 			goto End;
 		}else{
-		$batchWords = generateBatch($words);
-		$words=removeBatch($batchWords, $words);
+			$batchWords = generateBatch($words);
 
+			//Checks to see if there are enough words in the array to make a puzzle. If not, remove the first word and try again. If 
+			//there are no matches, ends the program and list all remaining words as unplaceable words. @kc9718us
+			if(count($batchWords) != $batch){
+				//Loop through the total number of words in the array for a match
+				for($i = 0; $i<=count($words); $i++){
+					$words = removeFirstWord($words);
+					$batchWords = generateBatch($words);
+					//If match is found, removes word from array and break out of loop
+					if(count($batchWords) == $batch){
+						$words = removeBatch($batchWords, $words);
+						break;
+					}else{
+						goto End;
+					}
+				}
+
+			}else{
+				$words = removeBatch($batchWords, $words);
+			}
 		// Creates a few Crossword Puzzles and then keeps the one with the most placed words
 		// Edited to accept batchWords instead of words to make Batch successful @kc9718us
 		$crosswordMaker = new CrosswordPuzzleMaker($width, $height, $batchWords);
@@ -374,6 +393,36 @@
 		}
 		return $wordArray;
 	}
+
+	/* Added function removeFirstWord. The function removes the first word of the array and places it at the end. The function helps support
+	the generateBatch function due to the function using the first word as the initial source. @kc9718us
+	*/
+	function removeFirstWord($wordArray){
+		$tempArray = $wordArray[0];
+		array_splice($wordArray,0,1);
+		array_push($wordArray, $tempArray);
+
+		return $wordArray;
+	}
+?>
+
+
+<!-- Added codes to ensure puzzle has right number of batch words. In the case of unplaced words being found, removes the first element of the
+array to the end and tries again for as many times as there are words in the array. If no solution is found, end and place the words as unplaced words. -->
+<?php
+	if(count($unplacedWords)>1){
+		removeFirstWord($batchWords);
+		foreach($batchWords as $keys){
+			array_push($words, $keys);
+		}
+		$wordCount++;
+		if($wordCount != count($words)){
+			goto Beginning;
+		}else{
+			goto End;
+		}
+	}
+
 ?>
 
 <!-- Gutted out most of the unrequired codes and kept the codes for skeleton puzzles only. @kc9718us -->
@@ -416,7 +465,8 @@
 					}
 				?>>
 				<div class="col-sm-12">
-					<h3> Warning - The following words could not be placed </h3>
+					<!-- Changed warning to space limitation @kc9718us -->
+					<h3> Warning - The following words could not be placed on the puzzle due to space</h3>
 					<?php
 						// Print unplaced words
 						foreach($unplacedWords as $word) {
@@ -581,8 +631,9 @@
 </html>
 <?php
 //Added codes for goto to loop the puzzle to the top to rerun to the codes to create puzzles. @kc9718us
-while($round != $endRound){
+while($round <= $endRound){
 	$round++;
+	$wordCount = 0;
 	goto Beginning;
 }
 //End point for goto loop to finish codes
