@@ -47,7 +47,7 @@
 				//Check to see if there is a hint, if no hint, append 1 as hint
 					$pos = strpos($line, ',');
 					if($pos == false){
-						$line .= ",1";
+						$line .= ",EMPTY";
 					}
 					//Proceed as normal
 	
@@ -86,19 +86,22 @@
 		return $words;
 	}
 
+//Add code to insert data into datatable
+
 
     if(is_array($words)){
         $dataArr = array();
         foreach($words as $row){
-		echo '<br Answer >'.$row[0].'<br>';
-		echo '<br Hint >'.$row[1].'<br>';
 
-        $sql = "INSERT INTO crosswords VALUES ('$row[0]', '$row[1];) ";
-        $result = mysqli_query($conn, $sql);
+        $sql = "INSERT INTO crosswords(answer, hint) VALUES ('$row[0]', '$row[1]') ";
+		if (mysqli_query($conn, $sql)) {
+			echo '<br>'.'New record created successfully for Answer: '.$row[0].'/Hint: '.$row[1];
+		  } else {
+			echo "Error: " . $sql . "<br>" . mysqli_error($conn);
+		  }
 		}
     }
 
     //header("Location: ../index.php?save=success");
     echo '<script>alert("Answers and Clues saved")</script>';
 ?>
-    

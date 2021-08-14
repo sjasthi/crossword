@@ -4,6 +4,27 @@ $left_buttons = "NO";
 $left_selected = "";
 ?>
 
+<!-- Added code to connect to database and grab data to be put into an array. @kc9718us -->
+<?php
+    include_once('Connection.php');
+
+    //Read data from database
+    $sql = "SELECT * FROM crosswords";
+    $result = mysqli_query($conn, $sql);
+    if (!$result) {
+         die("Query Failed."); 
+    }
+   
+    $words = [];
+    //Put data into array
+    if(mysqli_num_rows($result) > 0){
+        while($row = mysqli_fetch_assoc($result))
+        {
+            $words[] = $row;
+        }
+    }   
+?>
+
 <style>
     #title {
         text-align: center;
@@ -75,19 +96,21 @@ it is NOT required to have a action attribute on the form -->
                         </thead>
                         <tbody>
                             <?php
-/*                             if (!is_null($quotes)) {
-                                foreach ($quotes as $quote) {
+
+                            //Added codes to grab from array to display @kc9718us
+
+                             if (!is_null($words)) {
+                                foreach ($words as $word) {
                                     echo '<tr>
-                                        <td><input type ="radio" name ="ident" value =' . $quote["id"] . '></td>
-                                        <td>' . $quote["id"] . '</td>
-                                        <td>' . $quote["author"] . ' </span> </td>
-                                        <td>' . $quote["topic"] . '</td>
-                                        <td>' . $quote["quote"] . '</td>
+                                        <td><input type ="radio" name ="ident" value =' . $word["id"] . '></td>
+                                        <td>' . $word["id"] . '</td>
+                                        <td>' . $word["answer"] . ' </span> </td>
+                                        <td>' . $word["hint"] . '</td>
                                     </tr>';
                                 }
                             } else {
                                 echo "0 results";
-                            } */
+                            } 
                             ?>
                         </tbody>
                     </div>
